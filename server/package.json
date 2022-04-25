@@ -1,0 +1,25 @@
+{
+  "name": "multiplayerserver",
+  "version": "1.0.0",
+  "description": "A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexkomazec/masterProjectV2.git"
+  },
+  "author": "Aleksandar Komazec",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alexkomazec/masterProjectV2/issues"
+  },
+  "homepage": "https://github.com/alexkomazec/masterProjectV2#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "ip": "^1.1.5",
+    "mongoose": "^6.3.1",
+    "socket.io": "^4.4.1"
+  }
+}

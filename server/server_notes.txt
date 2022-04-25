@@ -1,0 +1,42 @@
+ME, OTHERS CONCEPT - Is the concept that represents the first person view (ME).
+					 Everything that is not me is OTHERS.
+					 
+				   - Responsible to emit some data that is changed on my side
+				   - Responsible to receive data from OTHERS
+				   - This concept is tied to players, and their abilities
+				   - Every client is ME from its prespective, and other players are
+				     OTHERS from its perspective
+
+SHARED RESOURCES CONCEPT - Is the concept that represents all shared objects between players
+						 - Shared objects are Map, Items, NPCs (friendly, and unfriendly)
+						 - Every client also supports SHARED RESOURCES CONCEPT
+						 - Every client is responsible to emit new changes 
+						 - Every client is responsible to receive, and updated shared resources
+						 POTENTIAL PROBLEM{ Two players update, and send modified share object}
+
+**********************ME, OTHERS CONCEPT***************************
+
+1. CHANGES REGARDING PLAYER (MOVEMENT, HP, ...)
+- Itslef player action changes:	emit, the player
+- Other players action changes: receive, and update, the player
+------------------------------------------------
+
+2. CHANGES REGARDING MAGIC
+- Itself magic (Number of magic balls changed, magic ball positions changed): emit, the magic
+- Other players magic balls: receive, and update, the magic
+------------------------------------------------
+
+**********************SHARED RESOURCES CONCEPT*************************************
+3. REST OF THE WORLD CHANGES (Map, collectibles, Enemies, Generaly NPCs)
+ 
+- If something changed in the world: emit the changes
+- World: receive, and update the specified thing in the world
+------------------------------------------------
+
+
+
+  Server									Client
+
+1.Connect									Connect
+2.UpdateNumberOfPlayers ------------------->------------->Fill Other players if needed
+3.RefreshPlayerArray	<---------------------------------Packet, and send player position					
