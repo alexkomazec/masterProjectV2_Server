@@ -47,6 +47,28 @@ class PacketedPlayerData {
     }
 }
 
+class PackedPlayerDataTmep {
+    constructor() {
+
+        this.abInputCommandList = new Array(MAX_NUMBER_OF_INPUT_COMMANDS);
+        this.position = new Array(VECTOR2);
+        this.playerID = 0
+
+        for (var i = 0; i < abInputCommandList.length ; i++) 
+        {
+            abInputCommandList[i] = false;
+        }
+
+        for (var i = 0; i < position.length ; i++) 
+        {
+            position[i] = 0.0;
+        }
+
+
+
+    } 
+}
+
 /*  ---------- Regular functions -----------------------------------------------------------------------------*/
 
 function registerEvents(socket)
@@ -100,12 +122,14 @@ function emit(socket, emitType, eventName, ...emitArgs)
 */
 function assignID2Player(socket)
 {
+    ppdT = new PackedPlayerDataTmep();
+    ppdT.playerID = iDForNextPlayer;
 	/* Push newly created player to the table*/
 	arrPlayers.push(new Player(iDForNextPlayer,socket,0,0));
     emit(socket, 
         EMIT_TO_SINGLE, 
         constants.ASSIGN_ID_2_PLAYER, 
-        iDForNextPlayer) //Payload
+        ppdT.playerID) //Payload
 
     console.debug(assignID2Player.name + ": id: " + iDForNextPlayer 
                 + " has been assigned to the client(socket value):" + socket.id )

@@ -1,0 +1,4 @@
+- When player cast a spell, the player is responsible to emit this event to the server  (no aditional data needed)
+- Server will receive this emit from this player, and will broadcast this event to all other players
+- All other players will get the event, and their world simulation will resolve it by creating a box2d object spell
+- That's it. Everything else should be automaticaly resloved by the world simulation.

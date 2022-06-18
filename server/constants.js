@@ -5,6 +5,9 @@ function define(name, value) {
     });
 }
 
+MAX_NUMBER_OF_INPUT_COMMANDS = 5
+VECTOR2 = 2
+
 /* This event is emitted when a new TCP stream is established */
 define("CONNECTION", "connection");
 
