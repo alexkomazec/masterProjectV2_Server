@@ -54,14 +54,14 @@ class PackedPlayerDataTmep {
         this.position = new Array(VECTOR2);
         this.playerID = 0
 
-        for (var i = 0; i < abInputCommandList.length ; i++) 
+        for (var i = 0; i < this.abInputCommandList.length ; i++) 
         {
-            abInputCommandList[i] = false;
+            this.abInputCommandList[i] = false;
         }
 
         for (var i = 0; i < position.length ; i++) 
         {
-            position[i] = 0.0;
+            this.position[i] = 0.0;
         }
 
 
