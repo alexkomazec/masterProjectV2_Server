@@ -14,7 +14,8 @@ const mongoDB = 'mongodb+srv://' + process.env.MONGO_DB_USERNAME + ':' + process
 
 const PlayerModel = require('./DataBaseModels/players'); 
 
-const PORT = 5000;
+//const PORT = 5000;
+const PORT = 8080;
 const IP_ADDRESS = ip.address()
 
 /* Connect to Mongo Data Base*/ 

@@ -17,8 +17,10 @@ var arrClbk_EmmitActions = [clbkEmitToClient, clbkBroadcast, clbkBroadcastAll];
 
 /* Array of connected players*/
 var arrPlayers = [];
-var iDForNextPlayer = 0;
 var socketIoServer
+
+var playerIDsArr = [false, false, false];
+var iDForNextPlayer = 0;
 
 /* Represent a player*/
 class Player {
@@ -59,25 +61,50 @@ class PackedPlayerDataTmep {
             this.abInputCommandList[i] = false;
         }
 
-        for (var i = 0; i < position.length ; i++) 
+        for (var i = 0; i < this.position.length ; i++) 
         {
             this.position[i] = 0.0;
         }
-
-
-
     } 
 }
 
 /*  ---------- Regular functions -----------------------------------------------------------------------------*/
 
+function findFreeID()
+{
+    for (let i = 0; i < playerIDsArr.length; i++)
+    {
+        if(playerIDsArr[i] === false)
+        {
+            playerIDsArr[i] = true;
+            return i;
+        }
+    }
+    return -555;
+}
+
 function registerEvents(socket)
 {
-    socket.on(constants.DISCONNECT, clbkPrintOnDisconnect)
     socket.on(constants.ADD_PLAYER, clbkAddPlayerToTheTable)
     socket.on(constants.REFRESH_PLAYERS_POSITION, clbkRefreshPlayerTable)
     socket.on(constants.UPDATE_PLAYER_POSITION, clbkUpdatePlayerPosition)
     socket.on(constants.MAGIC_FIRED, clbkPlayerFiresMagic)
+
+    socket.on(constants.DISCONNECT, function()
+    {
+        console.log("!!!!!!!!!! Disconnection Event !!!!!!!!!!");
+        let playerIndex = findThePlayerBySocketID(socket.id)
+
+        if (playerIndex > -1) {
+            playerIDsArr[playerIndex] = false;
+            arrPlayers.splice(playerIndex,1);
+            console.log("arrPlayers is " + arrPlayers);
+        }
+        console.log("Player with index " + playerIndex + " Disconnected");
+
+        printPlayers();
+        console.log("playerIDsArr:"+ playerIDsArr)
+    });
 }
 
 function printPlayers()
@@ -88,7 +115,7 @@ function printPlayers()
         console.debug(printPlayers.name + ": Player " + i + ": ")
         printObject(arrPlayers[i])
     }
-    console.debug(" ========= All Players have been printed =========")
+    console.debug("===================================================")
 }
 
 /* emit: This is a warpper function to socket.io emit options*/
@@ -101,11 +128,11 @@ function printPlayers()
 */
 function emit(socket, emitType, eventName, ...emitArgs)
 {
-    if(emitArgs.length == 0)
+    if(emitArgs.length === 0)
     {
         arrClbk_EmmitActions[emitType](socket, eventName)
     }
-    else if(emitArgs.length == 1)
+    else if(emitArgs.length === 1)
     {
         arrClbk_EmmitActions[emitType](socket, eventName, emitArgs[0])
     }
@@ -122,23 +149,33 @@ function emit(socket, emitType, eventName, ...emitArgs)
 */
 function assignID2Player(socket)
 {
-    ppdT = new PackedPlayerDataTmep();
-    ppdT.playerID = iDForNextPlayer;
-	/* Push newly created player to the table*/
-	arrPlayers.push(new Player(iDForNextPlayer,socket,0,0));
-    emit(socket, 
-        EMIT_TO_SINGLE, 
-        constants.ASSIGN_ID_2_PLAYER, 
-        ppdT.playerID) //Payload
+    //ppdT = new PackedPlayerDataTmep();
+    //ppdT.playerID = iDForNextPlayer;
 
-    console.debug(assignID2Player.name + ": id: " + iDForNextPlayer 
-                + " has been assigned to the client(socket value):" + socket.id )
+    iDForNextPlayer = findFreeID();
 
-	iDForNextPlayer++;
+    if(iDForNextPlayer !== -555)
+    {
+        /* Push newly created player to the table*/
+        arrPlayers.push(new Player(iDForNextPlayer,socket,0,0));
+        emit(socket,
+            EMIT_TO_SINGLE,
+            constants.ASSIGN_ID_2_PLAYER,
+            iDForNextPlayer ) //Payload
+
+        console.debug(assignID2Player.name + ": id: " + iDForNextPlayer
+            + " has been assigned to the client(socket value):" + socket.id )
+    }
+    else
+    {
+        let message = "The game is full, there is no space "
+        emit(socket, EMIT_TO_SINGLE, constants.DISCONNECT,
+            message) //Payload
+    }
 }
 
 
-/* findThePlayer: Find the player index if the player exists*/
+/* findThePlayerByID: Find the player index if the player exists*/
 
 /* Input parameters: 
     - playerId: Unique Id tied to a player
@@ -147,7 +184,7 @@ function assignID2Player(socket)
 /* Return parameters: 
     - index: The position of the player in the array
 */
-function findThePlayer(playerId)
+function findThePlayerByID(playerId)
 {
 	console.log("Search playerID " + playerId)
 
@@ -161,7 +198,35 @@ function findThePlayer(playerId)
         {
             return index;
         }
+    }
 
+    console.log("Element in the array has not found")
+    return -1;
+}
+
+/* findThePlayerBySocketID: Find the player index if the player exists*/
+
+/* Input parameters:
+    - playerId: Unique socket ID tied to a player
+*/
+
+/* Return parameters:
+    - index: The position of the player in the array
+*/
+function findThePlayerBySocketID(socketID)
+{
+    console.log("Search socketID " + socketID)
+
+    for (let index = 0; index < arrPlayers.length; index++)
+    {
+        let player = arrPlayers[index];
+        console.log("player ID ", player.playerID);
+        console.log("socket ID ", player.socket.id);
+
+        if(player.socket.id === socketID)
+        {
+            return index;
+        }
     }
 
     console.log("Element in the array has not found")
@@ -234,8 +299,15 @@ function clbkConnectionEstablished(socket,io, arrPlayers)
 }
 
 /* clbkPrintOnDisconnect: Print some message on disconnect event */
-function clbkPrintOnDisconnect() 
-{ 
+function clbkPrintOnDisconnect(socket)
+{
+    let playerIndex = findThePlayerBySocketID(socket.id)
+
+    if (playerIndex > -1) {
+        playerIDsArr[playerIndex] = false;
+        arrPlayers.splice(playerIndex,1);
+    }
+
     console.log("Player Disconnected");
 }
 
@@ -248,7 +320,7 @@ function clbkPrintOnDisconnect()
 */
 function clbkPlayerFiresMagic(clientID)
 { 
-    let tempSocket = arrPlayers[findThePlayer(clientID)].socket
+    let tempSocket = arrPlayers[findThePlayerByID(clientID)].socket
     emit(tempSocket, BROADCAST, constants.PLAYRED_FIRED_MAGIC, 
         clientID) //Payload
 }
@@ -262,7 +334,7 @@ function clbkPlayerFiresMagic(clientID)
 */
 function clbkUpdatePlayerPosition(playerID, moveDirection)
 {
-    let tempSocket = arrPlayers[findThePlayer(playerID)].socket
+    let tempSocket = arrPlayers[findThePlayerByID(playerID)].socket
     console.log("Player with PlayerID" + playerID + " has changed the position");
     let packet = []
 
@@ -284,7 +356,9 @@ function clbkUpdatePlayerPosition(playerID, moveDirection)
 */
 function clbkRefreshPlayerTable(player_x, player_y, clientID)
 {
-    let index = findThePlayer(clientID);
+    console.log("!!!!!!!!!! Refersh the players Event !!!!!!!!!!");
+
+    let index = findThePlayerByID(clientID);
     let tempPacketPlayers = [];
 
     arrPlayers[index].x_pos = player_x;
@@ -306,8 +380,9 @@ function clbkRefreshPlayerTable(player_x, player_y, clientID)
     - clientID: Unique client id
 */
 function clbkAddPlayerToTheTable(player_x, player_y, clientID)
-{ 
-    let index = findThePlayer(clientID);
+{
+    console.log("!!!!!!!!!! Add Player To the Table Event !!!!!!!!!!");
+    let index = findThePlayerByID(clientID);
 	let player = arrPlayers[index]
 
     player.x_pos = player_x;
@@ -342,7 +417,7 @@ function clbkEmitToClient(socket, eventName, ...args)
         log.error(clbkEmitToClient.name + "Invalid Number of Arguments");
 }
 
-/* clbkBroadcast: Broadcast event to all socket, except current socket*/
+/* clbkBroadcast: Broadcast event to all sockets, except current socket*/
 
 /* Input parameters: 
     - socket:   Client socket that is connected to the server socket 
@@ -353,12 +428,12 @@ function clbkEmitToClient(socket, eventName, ...args)
 function clbkBroadcast(socket, eventName, ...args)
 {
     console.log(clbkBroadcast.name, "socket: " + socket.id + " args: "+ args)
-    if(args.length == 0)
+    if(args.length === 0)
     {
         /* Emit event name */
         socket.broadcast.emit(eventName);
     }
-    else if(args.length == 1)
+    else if(args.length === 1)
         /* Emit event name, and payload */
         socket.broadcast.emit(eventName,args[0]);
     else
