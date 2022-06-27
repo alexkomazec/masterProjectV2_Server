@@ -87,7 +87,7 @@ function registerEvents(socket)
 {
     socket.on(constants.ADD_PLAYER, clbkAddPlayerToTheTable)
     socket.on(constants.REFRESH_PLAYERS_POSITION, clbkRefreshPlayerTable)
-    socket.on(constants.UPDATE_PLAYER_POSITION, clbkUpdatePlayerPosition)
+    socket.on(constants.UPDATE_PLAYER_INPUT_CMD, clbkUpdatePlayerInputCmd)
     socket.on(constants.MAGIC_FIRED, clbkPlayerFiresMagic)
 
     socket.on(constants.DISCONNECT, function()
@@ -325,22 +325,22 @@ function clbkPlayerFiresMagic(clientID)
         clientID) //Payload
 }
 
-/* clbkUpdatePlayerPosition: Refersh the players' table with lastest players' info, and broacast the table */
+/* clbkUpdatePlayerInputCmd: Refersh the players' table with lastest players' info, and broacast the table */
 
 /* Input parameters: 
-    - player_x: Player's x position
-    - player_y: Player's y position
-    - clientID: Player's unique identifier
+    - playerID: player ID
+    - inputSchema: static array of boolean values that represents possible commands (LEFT, RIGHT, JUMP, FIRE ...)
 */
-function clbkUpdatePlayerPosition(playerID, moveDirection)
+function clbkUpdatePlayerInputCmd(playerID, inputSchema)
 {
     let tempSocket = arrPlayers[findThePlayerByID(playerID)].socket
     console.log("Player with PlayerID" + playerID + " has changed the position");
     let packet = []
 
     packet.push(playerID)
-    packet.push(moveDirection)
-    
+    packet.push(inputSchema)
+    console.log("**********PlayerInputCmd************" + packet)
+
     emit(tempSocket, 
         BROADCAST, 
         constants.SOME_PLAYER_MOVED, 
