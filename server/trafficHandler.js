@@ -341,10 +341,7 @@ function clbkUpdatePlayerInputCmd(playerID, inputSchema)
     packet.push(inputSchema)
     console.log("**********PlayerInputCmd************" + packet)
 
-    emit(tempSocket, 
-        BROADCAST, 
-        constants.SOME_PLAYER_MOVED, 
-        packet)
+    socketIoServer.emit(constants.SOME_PLAYER_MOVED, packet);
 }
 
 /* clbkRefreshPlayerTable: Refersh the players' table with lastest players' info, and broacast the table */
