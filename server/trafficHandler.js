@@ -359,7 +359,7 @@ function clbkRefreshPlayerTable(player_x, player_y, clientID)
     let index = findThePlayerByID(clientID);
     let tempPacketPlayers = [];
 
-    arrPlayers[index].x_pos = player_x;
+    arrPlayers[indezx].x_pos = player_x;
     arrPlayers[index].y_pos = player_y;
     
     console.log("Player table has been refreshed")
@@ -379,7 +379,7 @@ function clbkUpdatePlayerInputPos(player_x, player_y, clientID)
     arrPlayers[index].y_pos = player_y;
     printPlayers();
 
-    emit(player.socket,
+    emit(arrPlayers[index].socket,
         BROADCAST,
         constants.GET_UPDATED_POSITION,
         new PacketedPlayerData(clientID, player_x, player_y));
