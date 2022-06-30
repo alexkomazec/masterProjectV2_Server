@@ -89,6 +89,7 @@ function registerEvents(socket)
     socket.on(constants.REFRESH_PLAYERS_POSITION, clbkRefreshPlayerTable)
     socket.on(constants.UPDATE_PLAYER_INPUT_CMD, clbkUpdatePlayerInputCmd)
     socket.on(constants.MAGIC_FIRED, clbkPlayerFiresMagic)
+    socket.on(constants.UPDATE_PLAYER_INPUT_POS, clbkUpdatePlayerInputPos)
 
     socket.on(constants.DISCONNECT, function()
     {
@@ -367,6 +368,23 @@ function clbkRefreshPlayerTable(player_x, player_y, clientID)
 
     socketIoServer.emit(constants.UPDATE_PLAYER_TABLE, tempPacketPlayers);
 }
+
+function clbkUpdatePlayerInputPos(player_x, player_y, clientID)
+{
+    console.log("!!!!!!!!!! clbkUpdatePlayerInputPos !!!!!!!!!!");
+
+    let index = findThePlayerByID(clientID);
+
+    arrPlayers[index].x_pos = player_x;
+    arrPlayers[index].y_pos = player_y;
+    printPlayers();
+
+    emit(player.socket,
+        BROADCAST,
+        constants.GET_UPDATED_POSITION,
+        new PacketedPlayerData(clientID, player_x, player_y));
+}
+
 
 /* clbkAddPlayerToTheTable: Activated when get the request to add the new player to the table */
 

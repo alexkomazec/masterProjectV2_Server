@@ -43,3 +43,5 @@ define("PLAYRED_FIRED_MAGIC","playerFiredMagic")
 
 /* LISTEN: This event is emitted on request, when the player moves, player must notify server, and server should broadcast that*/
 define("UPDATE_PLAYER_INPUT_CMD", "updatePlayerInputCmd")
+
+define("UPDATE_PLAYER_INPUT_POS", "updatePlayerInputPosition")
