@@ -45,3 +45,5 @@ define("PLAYRED_FIRED_MAGIC","playerFiredMagic")
 define("UPDATE_PLAYER_INPUT_CMD", "updatePlayerInputCmd")
 
 define("UPDATE_PLAYER_INPUT_POS", "updatePlayerInputPosition")
+
+define("UPDATE_PLAYER_INPUT_POS_RESP", "updatePlayerInputPositionResp")
