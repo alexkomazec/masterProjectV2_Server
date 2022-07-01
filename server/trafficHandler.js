@@ -327,7 +327,7 @@ function clbkPlayerFiresMagic(playerID, inputSchema)
     packet.push(inputSchema)
     console.log("**********PlayerFiresMagic************" + packet)
 
-    emit(arrPlayers[index].socket,
+    emit(tempSocket,
         BROADCAST,
         constants.PLAYER_FIRED_MAGIC,
         packet);
@@ -349,7 +349,7 @@ function clbkUpdatePlayerInputCmd(playerID, inputSchema)
     packet.push(inputSchema)
     console.log("**********PlayerInputCmd************" + packet)
 
-    emit(arrPlayers[index].socket,
+    emit(tempSocket,
         BROADCAST,
         constants.SOME_PLAYER_MOVED,
         packet);
