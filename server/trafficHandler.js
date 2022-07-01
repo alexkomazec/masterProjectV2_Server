@@ -90,6 +90,7 @@ function registerEvents(socket)
     socket.on(constants.UPDATE_PLAYER_INPUT_CMD, clbkUpdatePlayerInputCmd)
     socket.on(constants.MAGIC_FIRED, clbkPlayerFiresMagic)
     socket.on(constants.UPDATE_PLAYER_INPUT_POS, clbkUpdatePlayerInputPos)
+    socket.on(constants.PLAYER_CHANGED_DIRECTION_REQ, clbkPlayerChangedDirReq)
 
     socket.on(constants.DISCONNECT, function()
     {
@@ -330,6 +331,19 @@ function clbkPlayerFiresMagic(playerID, inputSchema)
     emit(tempSocket,
         BROADCAST,
         constants.PLAYER_FIRED_MAGIC,
+        packet);
+}
+
+function clbkPlayerChangedDirReq(playerID, direction)
+{
+    let tempSocket = arrPlayers[findThePlayerByID(playerID)].socket
+    let packet = []
+    packet.push(playerID)
+    console.log("**********PlayerChangedDirReq************" + packet)
+
+    emit(tempSocket,
+        BROADCAST,
+        constants.PLAYER_CHANGED_DIRECTION_RESP,
         packet);
 }
 
