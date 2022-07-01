@@ -95,17 +95,22 @@ function registerEvents(socket)
     socket.on(constants.DISCONNECT, function()
     {
         console.log("!!!!!!!!!! Disconnection Event !!!!!!!!!!");
-        let playerIndex = findThePlayerBySocketID(socket.id)
+        let playerId = findThePlayerBySocketID(socket.id)
 
-        if (playerIndex > -1) {
-            playerIDsArr[playerIndex] = false;
-            arrPlayers.splice(playerIndex,1);
+        if (playerId > -1) {
+            playerIDsArr[playerId] = false;
+            arrPlayers.splice(playerId,1);
             console.log("arrPlayers is " + arrPlayers);
         }
-        console.log("Player with index " + playerIndex + " Disconnected");
+        console.log("Player with index " + playerId + " Disconnected");
 
         printPlayers();
         console.log("playerIDsArr:"+ playerIDsArr)
+
+        emit(socket,
+            BROADCAST,
+            constants.PLAYER_DISCONNECTED,
+            playerId ) //Payload
     });
 }
 

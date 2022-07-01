@@ -17,9 +17,6 @@ define("DISCONNECT", "disconnect");
 /* EMIT: This event is emitted when the server requires the most updated clients' position*/
 define("GET_UPDATED_POSITION", "getUpdatedPosition");
 
-/* This event is emitted when the player is disconnected */
-define("PLAYER_DISCONNECTED", "playerDisconnected");
-
 /* EMIT: This event is emitted to assign available id to the client*/
 define("ASSIGN_ID_2_PLAYER", "assignID2Player");
 
@@ -51,3 +48,5 @@ define("UPDATE_PLAYER_INPUT_POS_RESP", "updatePlayerInputPositionResp")
 define("PLAYER_CHANGED_DIRECTION_REQ", "playerChangedDirReq")
 
 define("PLAYER_CHANGED_DIRECTION_RESP", "playerChangedDirResp")
+
+define("PLAYER_DISCONNECTED", "playerDisconnected")
