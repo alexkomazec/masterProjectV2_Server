@@ -39,7 +39,7 @@ define("SOME_PLAYER_MOVED","playerMoved")
 define("MAGIC_FIRED","magicFired")
 
 /* EMIT: This event is used to broadcast information that some player fires magic*/
-define("PLAYRED_FIRED_MAGIC","playerFiredMagic")
+define("PLAYER_FIRED_MAGIC","playerFiredMagic")
 
 /* LISTEN: This event is emitted on request, when the player moves, player must notify server, and server should broadcast that*/
 define("UPDATE_PLAYER_INPUT_CMD", "updatePlayerInputCmd")

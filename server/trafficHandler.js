@@ -319,11 +319,18 @@ function clbkPrintOnDisconnect(socket)
 /* Input parameters: 
     - clientID: Player's unique identifier
 */
-function clbkPlayerFiresMagic(clientID)
+function clbkPlayerFiresMagic(clientID, inputSchema)
 { 
     let tempSocket = arrPlayers[findThePlayerByID(clientID)].socket
-    emit(tempSocket, BROADCAST, constants.PLAYRED_FIRED_MAGIC, 
-        clientID) //Payload
+    let packet = []
+    packet.push(playerID)
+    packet.push(inputSchema)
+    console.log("**********PlayerFiresMagic************" + packet)
+
+    emit(arrPlayers[index].socket,
+        BROADCAST,
+        constants.PLAYER_FIRED_MAGIC,
+        packet);
 }
 
 /* clbkUpdatePlayerInputCmd: Refersh the players' table with lastest players' info, and broacast the table */
