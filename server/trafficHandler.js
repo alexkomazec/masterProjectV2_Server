@@ -319,9 +319,9 @@ function clbkPrintOnDisconnect(socket)
 /* Input parameters: 
     - clientID: Player's unique identifier
 */
-function clbkPlayerFiresMagic(clientID, inputSchema)
+function clbkPlayerFiresMagic(playerID, inputSchema)
 { 
-    let tempSocket = arrPlayers[findThePlayerByID(clientID)].socket
+    let tempSocket = arrPlayers[findThePlayerByID(playerID)].socket
     let packet = []
     packet.push(playerID)
     packet.push(inputSchema)
