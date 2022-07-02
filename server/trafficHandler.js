@@ -49,25 +49,6 @@ class PacketedPlayerData {
     }
 }
 
-class PackedPlayerDataTmep {
-    constructor() {
-
-        this.abInputCommandList = new Array(MAX_NUMBER_OF_INPUT_COMMANDS);
-        this.position = new Array(VECTOR2);
-        this.playerID = 0
-
-        for (var i = 0; i < this.abInputCommandList.length ; i++) 
-        {
-            this.abInputCommandList[i] = false;
-        }
-
-        for (var i = 0; i < this.position.length ; i++) 
-        {
-            this.position[i] = 0.0;
-        }
-    } 
-}
-
 /*  ---------- Regular functions -----------------------------------------------------------------------------*/
 
 function findFreeID()
@@ -145,7 +126,7 @@ function emit(socket, emitType, eventName, ...emitArgs)
     }
     else
     {
-        log.error(clbkBroadcastAll.name + "Invalid Number of Arguments");
+        console.error(clbkBroadcastAll.name + "Invalid Number of Arguments");
     }
 }
 
@@ -303,19 +284,6 @@ function clbkConnectionEstablished(socket,io, arrPlayers)
     registerEvents(socket);
 
     assignID2Player(socket, arrPlayers);
-}
-
-/* clbkPrintOnDisconnect: Print some message on disconnect event */
-function clbkPrintOnDisconnect(socket)
-{
-    let playerIndex = findThePlayerBySocketID(socket.id)
-
-    if (playerIndex > -1) {
-        playerIDsArr[playerIndex] = false;
-        arrPlayers.splice(playerIndex,1);
-    }
-
-    console.log("Player Disconnected");
 }
 
 /* ---------- Custom Event callbacks -------------------------------------------------------------------------*/

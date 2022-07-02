@@ -50,7 +50,6 @@ mongoose.connect(mongoDB,
 
     if(areCredentialsReal == 0)
     {
-        console.log("here!!!!!!!!!!")
         profileUsername = hardcodedUsername
         profilePassword = hardcodedPassword
     }
