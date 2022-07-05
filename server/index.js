@@ -29,6 +29,9 @@ mongoose.connect(mongoDB,
     console.log("Connected to MongoDB")
     console.log("Ready to serve the clients")
 
+    /* Reset online satus */
+    setAllPlayersOffline()
+
     /* Server is starting to listen to PORT, at IP_ADDRESS*/
     server.listen(PORT, trafficHandler.clbkPrintNetworkInfo(PORT, IP_ADDRESS));
 
@@ -188,8 +191,22 @@ mongoose.connect(mongoDB,
          }
      }
 
+
+     async function setAllPlayersOffline()
+     {
+         PlayerModel.find({}, function (err, listOfFoundUsers)
+         {
+             for (let i = 0; i < listOfFoundUsers.length; i++)
+             {
+                 updateTheDocument(listOfFoundUsers[i].username.toString(),
+                     'currentlyOnline',
+                     'false')
+             }
+         })
+     }
      exports.signOutUser = function signOutUser(username)
      {
          console.log("user signed out!")
          updateTheDocument(username, "currentlyOnline", "false")
      }
+
