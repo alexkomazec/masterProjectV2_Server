@@ -21,6 +21,8 @@ var arrPlayers = [];
 var socketIoServer
 
 var playerIDsArr = [false, false, false];
+var playersReadyToStart = 0;
+
 var iDForNextPlayer = 0;
 
 /* Represent a player*/
@@ -53,6 +55,18 @@ class PacketedPlayerData {
 
 /*  ---------- Regular functions -----------------------------------------------------------------------------*/
 
+function isGameSessionAvailable()
+{
+    let isGameAvailable = false;
+
+    if(arrPlayers.length < constants.MAX_NUM_PLAYERS)
+    {
+        isGameAvailable = true;
+    }
+
+    return isGameAvailable
+}
+
 function findFreeID()
 {
     for (let i = 0; i < playerIDsArr.length; i++)
@@ -74,6 +88,7 @@ function registerEvents(socket)
     socket.on(constants.MAGIC_FIRED, clbkPlayerFiresMagic)
     socket.on(constants.UPDATE_PLAYER_INPUT_POS, clbkUpdatePlayerInputPos)
     socket.on(constants.PLAYER_CHANGED_DIRECTION_REQ, clbkPlayerChangedDirReq)
+    socket.on(constants.PLAYER_TABLE_UPDATED, clbkPlayerTableUpdated)
 
     socket.on(constants.DISCONNECT, function()
     {
@@ -386,6 +401,18 @@ function clbkUpdatePlayerInputPos(player_x, player_y, clientID)
         new PacketedPlayerData(clientID, player_x, player_y));
 }
 
+function clbkPlayerTableUpdated(clientID)
+{
+    playersReadyToStart = playersReadyToStart+1;
+    console.log("Player with ID" + clientID + " is ready to start the game")
+
+    if(playersReadyToStart === constants.MAX_NUM_PLAYERS)
+    {
+        console.log("All players are ready, Tell them to create enemies, and start the game")
+        socketIoServer.emit(constants.CREATE_ALL_ENEMIES);
+    }
+}
+
 
 /* clbkAddPlayerToTheTable: Activated when get the request to add the new player to the table */
 
@@ -409,7 +436,6 @@ function clbkAddPlayerToTheTable(player_x, player_y, clientID)
     emit(player.socket, 
         BROADCAST, 
         constants.GET_UPDATED_POSITION);
-
 }
 
 /* clbkEmitToClient: Emit event to socket*/
@@ -423,10 +449,10 @@ function clbkAddPlayerToTheTable(player_x, player_y, clientID)
 function clbkEmitToClient(socket, eventName, ...args)
 {
     console.log(clbkEmitToClient.name, "socket: " + socket.id + " args: "+ args)
-    if(args.length == 0)
+    if(args.length === 0)
         /* Emit event name */
         socket.emit(eventName);
-    else if(args.length == 1)
+    else if(args.length === 1)
         /* Emit event name, and payload */
         socket.emit(eventName,args[0]);
     else
@@ -478,3 +504,4 @@ function clbkBroadcastAll(eventName, ...args)
 
 module.exports.clbkPrintNetworkInfo = clbkPrintNetworkInfo
 module.exports.clbkConnectionEstablished = clbkConnectionEstablished
+module.exports.isGameSessionAvailable = isGameSessionAvailable

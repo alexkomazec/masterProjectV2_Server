@@ -5,8 +5,7 @@ function define(name, value) {
     });
 }
 
-MAX_NUMBER_OF_INPUT_COMMANDS = 5
-VECTOR2 = 2
+define("MAX_NUM_PLAYERS", 3)
 
 /* LISTEN: This event is emitted when a new TCP stream is established */
 define("CONNECTION", "connection");
@@ -50,3 +49,9 @@ define("PLAYER_CHANGED_DIRECTION_REQ", "playerChangedDirReq")
 define("PLAYER_CHANGED_DIRECTION_RESP", "playerChangedDirResp")
 
 define("PLAYER_DISCONNECTED", "playerDisconnected")
+
+/* Server has been informed that the client updated its player table */
+define("PLAYER_TABLE_UPDATED", "playerTableUpdated")
+
+/* Inform Clients that should create everything on the map, and start the game */
+define("CREATE_ALL_ENEMIES", "createAllEnemies")

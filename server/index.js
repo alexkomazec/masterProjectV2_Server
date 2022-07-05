@@ -41,80 +41,114 @@ mongoose.connect(mongoDB,
 
 }).catch(err => console.error(err))
 
- io.use((socket, next) => {
+ io.use((socket, next) =>
+ {
 
-    // 0 - No, credentials are hardcoded    
-    var areCredentialsReal = 1
-    profileUsername = socket.handshake.auth.username
-    profilePassword = socket.handshake.auth.password
-    var hardcodedUsername = "aleksandarkomazec5@gmail.com"
-    var hardcodedPassword = "aleksandarkomazec5"
-    var userNameFound = 1;
+     // 0 - No, credentials are hardcoded
+     const areCredentialsReal = 1;
+     profileUsername = socket.handshake.auth.username
+     profilePassword = socket.handshake.auth.password
+     const hardcodedUsername = "aleksandarkomazec5@gmail.com";
+     const hardcodedPassword = "aleksandarkomazec5";
 
-    if(areCredentialsReal === 0)
+     if (areCredentialsReal === 0) {
+         profileUsername = hardcodedUsername
+         profilePassword = hardcodedPassword
+     }
+
+     if (socket.handshake.auth.needToLogin === "true")
+     {
+         /* Do Logging, hint: forward next registered middleware function name */
+         processLogin(next)
+     }
+     else
+     {
+         /* Do Registration */
+         processRegister(next,socket)
+     }
+ })
+
+    function processLogin(next)
     {
-        profileUsername = hardcodedUsername
-        profilePassword = hardcodedPassword
-    }
+        console.log("Attempt to login")
 
-    PlayerModel.find({username: profileUsername},
-         function (err, listOfFoundUsers) {
-            if (err) {
+        PlayerModel.find({username: profileUsername}, function (err, listOfFoundUsers)
+        {
+            /* Check for the error */
+            if (err)
+            {
                 console.log("Error!!!")
                 return next(new Error("Something went wrong!"));
             }
 
-            if (!listOfFoundUsers.length || listOfFoundUsers > 1) {
-                console.log("Username is not found");
-                userNameFound = 0;
+
+            /* Check for findings in data base */
+            if (!listOfFoundUsers.length) {
+                return next(new Error("Username is not found"));
             }
 
-            if (listOfFoundUsers[0].currentlyOnline === "true") {
+            /* Check for duplication */
+            if(listOfFoundUsers.length > 1)
+            {
+                return next(new Error("Internal Error: More than one player found"));
+            }
+
+            /* Check if the user is currently online*/
+            if (listOfFoundUsers[0].currentlyOnline === "true")
+            {
                 return next(new Error("User has been already loged in"));
             }
 
-            if (socket.handshake.auth.needToLogin === "true") {
-                console.log("Attempt to login")
-                /* Connection attempt*/
-                if (userNameFound == 1) {
-                    /* Username found, then check if the password macthes*/
-                    if (listOfFoundUsers[0].password === profilePassword)//socket.handshake.auth.password)
-                    {
-                        /* Password matches, connect it*/
-                        /* Regular login, accept socket connectiom from the client*/
-                        updateTheDocument(listOfFoundUsers[0].username.toString(),
-                                        'currentlyOnline',
-                                         'true')
-                        next();
-                    } else {
-                        return next(new Error("Invalid password"));
-                    }
-
-                } else {
-                    return next(new Error("Username not found"));
-                }
-            } else {
-                console.log("Attempt to Register")
-
-                /* Registration attempt*/
-                if (userNameFound == 1) {
-                    return next(new Error("Already registered"));
-                } else {
-                    var player = new PlayerModel({
-                        username: socket.handshake.auth.username,
-                        password: socket.handshake.auth.password,
-                        currentlyOnline: 'false'
-                    })
-
-                    saveTheDocument(player)
-                }
+            /* Username found, then check if the password macthes*/
+            if (listOfFoundUsers[0].password !== profilePassword)//socket.handshake.auth.password)
+            {
+                return next(new Error("Invalid password"));
             }
-        });
+
+            /* Check if the game session is already running*/
+            if (!trafficHandler.isGameSessionAvailable()) {
+                return next(new Error("Game is already running, try later"));
+            }
+
+            /* Regular login, accept socket connectiom from the client*/
+            updateTheDocument(listOfFoundUsers[0].username.toString(),
+                'currentlyOnline',
+                'true')
+            next();
+        })
+    }
+
+    function processRegister(next, socket)
+    {
+        console.log("Attempt to Register")
+
+        PlayerModel.find({username: profileUsername}, function (err, listOfFoundUsers)
+        {
+            /* Check for the error */
+            if (err)
+            {
+                console.log("Error!!!")
+                return next(new Error("Something went wrong!"));
+            }
+
+            /* Check for findings in data base */
+            if (listOfFoundUsers.length) {
+                return next(new Error("Already registered"));
+            }
+
+            const player = new PlayerModel({
+                username: socket.handshake.auth.username,
+                password: socket.handshake.auth.password,
+                currentlyOnline: 'false'
+            });
+            saveTheDocument(player, next)
+        })
+    }
 
     /* Insert the new document if does not exist*/
-    function saveTheDocument(moongoseModel)
+    function saveTheDocument(mongooseModel, next)
     {
-        moongoseModel.save(function (err) {
+        mongooseModel.save(function (err) {
         if (err)
         {
             return next(new Error("Something went wrong during registration"));
@@ -128,9 +162,10 @@ mongoose.connect(mongoDB,
      *  fieldName - Field that Model schema should contain
      *  fieldValue - Field value that should be string
      * */
-     async function updateTheDocument(userName, fieldName, filedValue) {
+     async function updateTheDocument(userName, fieldName, filedValue)
+     {
 
-         var res;
+         let res;
 
          if(fieldName === "currentlyOnline")
          {
@@ -158,6 +193,3 @@ mongoose.connect(mongoDB,
          console.log("user signed out!")
          updateTheDocument(username, "currentlyOnline", "false")
      }
-
-
-});
