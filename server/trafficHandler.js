@@ -401,13 +401,13 @@ function clbkUpdatePlayerInputPos(player_x, player_y, clientID)
         new PacketedPlayerData(clientID, player_x, player_y));
 }
 
-function clbkPlayerTableUpdated(clientID)
-{
-    playersReadyToStart = playersReadyToStart+1;
+async function clbkPlayerTableUpdated(clientID) {
+    playersReadyToStart = playersReadyToStart + 1;
     console.log("Player with ID" + clientID + " is ready to start the game")
 
-    if(playersReadyToStart === constants.MAX_NUM_PLAYERS)
-    {
+    if (playersReadyToStart === constants.MAX_NUM_PLAYERS) {
+
+        await new Promise(resolve => setTimeout(resolve, 5000));
         console.log("All players are ready, Tell them to create enemies, and start the game")
         socketIoServer.emit(constants.CREATE_ALL_ENEMIES);
     }

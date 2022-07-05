@@ -184,11 +184,6 @@ mongoose.connect(mongoDB,
          {
              console.log("No matching document")
          }
-
-         if(res.modifiedCount === 0)
-         {
-             console.log("modifiedCount is zero")
-         }
      }
 
 
