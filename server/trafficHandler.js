@@ -8,6 +8,7 @@
 */
 
 var constants = require("./constants");
+var signingFunctions = require('./index.js');
 
 /* Types of emmiting events */
 const EMIT_TO_SINGLE     = 0 // Emmit event only to the current socket
@@ -24,14 +25,15 @@ var iDForNextPlayer = 0;
 
 /* Represent a player*/
 class Player {
-    constructor(playerID, socket, x_pos, y_pos) {
-
+    constructor(playerID, socket, x_pos, y_pos, userName) {
+        this.username = userName
         this.playerID = playerID;
         this.socket = socket;
         this.x_pos = x_pos;
         this.y_pos = y_pos;
     }
 }
+
 
 /* Represent a packet player, ready to be emmited to clients*/
 /* Reason for decision: Player class contains a field  this.socket that represents saved socket,
@@ -80,8 +82,10 @@ function registerEvents(socket)
 
         if (playerId > -1) {
             playerIDsArr[playerId] = false;
+            signingFunctions.signOutUser(arrPlayers[playerId].username)
             arrPlayers.splice(playerId,1);
             console.log("arrPlayers is " + arrPlayers);
+
         }
         console.log("Player with index " + playerId + " Disconnected");
 
@@ -135,7 +139,7 @@ function emit(socket, emitType, eventName, ...emitArgs)
 /* Input parameters: 
     - socket: Client socket that is connected to the server socket 
 */
-function assignID2Player(socket)
+function assignID2Player(socket, userName)
 {
     //ppdT = new PackedPlayerDataTmep();
     //ppdT.playerID = iDForNextPlayer;
@@ -145,7 +149,7 @@ function assignID2Player(socket)
     if(iDForNextPlayer !== -555)
     {
         /* Push newly created player to the table*/
-        arrPlayers.push(new Player(iDForNextPlayer,socket,0,0));
+        arrPlayers.push(new Player(iDForNextPlayer,socket,0,0, userName));
         emit(socket,
             EMIT_TO_SINGLE,
             constants.ASSIGN_ID_2_PLAYER,
@@ -275,7 +279,7 @@ function clbkPrintNetworkInfo(port, ipAddress)
 /* Input parameters: 
     - socket: Client socket that is connected to the server socket 
 */
-function clbkConnectionEstablished(socket,io, arrPlayers)
+function clbkConnectionEstablished(socket,io, userName)
 {
     /*Get the server instance from the entry point, so it can be used wherever needed*/
     socketIoServer = io
@@ -283,7 +287,7 @@ function clbkConnectionEstablished(socket,io, arrPlayers)
     console.debug("Player Connected!");
     registerEvents(socket);
 
-    assignID2Player(socket, arrPlayers);
+    assignID2Player(socket, userName);
 }
 
 /* ---------- Custom Event callbacks -------------------------------------------------------------------------*/
@@ -312,7 +316,7 @@ function clbkPlayerChangedDirReq(playerID, direction)
     let tempSocket = arrPlayers[findThePlayerByID(playerID)].socket
     let packet = []
     packet.push(playerID)
-    console.log("**********PlayerChangedDirReq************" + packet)
+   // console.log("**********PlayerChangedDirReq************" + packet)
 
     emit(tempSocket,
         BROADCAST,
@@ -329,12 +333,12 @@ function clbkPlayerChangedDirReq(playerID, direction)
 function clbkUpdatePlayerInputCmd(playerID, inputSchema)
 {
     let tempSocket = arrPlayers[findThePlayerByID(playerID)].socket
-    console.log("Player with PlayerID" + playerID + " has changed the position");
+    //console.log("Player with PlayerID" + playerID + " has changed the position");
     let packet = []
 
     packet.push(playerID)
     packet.push(inputSchema)
-    console.log("**********PlayerInputCmd************" + packet)
+    //console.log("**********PlayerInputCmd************" + packet)
 
     emit(tempSocket,
         BROADCAST,
