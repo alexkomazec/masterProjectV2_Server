@@ -5,7 +5,7 @@ function define(name, value) {
     });
 }
 
-define("MAX_NUM_PLAYERS", 3)
+define("MAX_NUM_PLAYERS", 2)
 
 /* LISTEN: This event is emitted when a new TCP stream is established */
 define("CONNECTION", "connection");
