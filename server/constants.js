@@ -7,6 +7,8 @@ function define(name, value) {
 
 define("MAX_NUM_PLAYERS", 2)
 
+define("SLEEPING_TIME_MS", 5000)
+
 /* LISTEN: This event is emitted when a new TCP stream is established */
 define("CONNECTION", "connection");
 

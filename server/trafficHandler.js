@@ -284,9 +284,9 @@ function packetPlayers()
 */
 function clbkPrintNetworkInfo(port, ipAddress)
 {
-    console.log("Server is now running...");
-	console.log("Listening to Port: ", port)
-	console.log("At Address", ipAddress)
+    console.info("Server is now running...");
+	console.info("Listening to Port: ", port)
+	console.info("At Address", ipAddress)
 }
 
 /* clbkConnectionEstablished: Activated when TCP connection is established */
@@ -299,7 +299,7 @@ function clbkConnectionEstablished(socket,io, userName)
     /*Get the server instance from the entry point, so it can be used wherever needed*/
     socketIoServer = io
 
-    console.debug("Player Connected!");
+    console.info("Player Connected!");
     registerEvents(socket);
 
     assignID2Player(socket, userName);
@@ -407,7 +407,7 @@ async function clbkPlayerTableUpdated(clientID) {
 
     if (playersReadyToStart === constants.MAX_NUM_PLAYERS) {
 
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        await new Promise(resolve => setTimeout(resolve, constants.SLEEPING_TIME_MS));
         console.log("All players are ready, Tell them to create enemies, and start the game")
         socketIoServer.emit(constants.CREATE_ALL_ENEMIES);
     }

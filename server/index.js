@@ -17,6 +17,13 @@ const PlayerModel = require('./DataBaseModels/players');
 var profileUsername
 var profilePassword
 
+
+console.log = function() {}
+//console.info = function () {}
+console.debug = function() {}
+//console.warn = function() {}
+//console.error = function() {}
+
 //const PORT = 5000;
 const PORT = 8080;
 const IP_ADDRESS = ip.address()
@@ -26,8 +33,8 @@ mongoose.connect(mongoDB,
     {useNewUrlParser: true,
     useUnifiedTopology: true }).then(()=>
 {
-    console.log("Connected to MongoDB")
-    console.log("Ready to serve the clients")
+    console.info("Connected to MongoDB")
+    console.info("Ready to serve the clients")
 
     /* Reset online satus */
     setAllPlayersOffline()
@@ -199,6 +206,7 @@ mongoose.connect(mongoDB,
              }
          })
      }
+
      exports.signOutUser = function signOutUser(username)
      {
          console.log("user signed out!")
