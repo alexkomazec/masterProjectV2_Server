@@ -25,6 +25,9 @@ var playersReadyToStart = 0;
 
 var iDForNextPlayer = 0;
 
+/* Note: This is just for testing purposes for getting hardcoded rooms status*/
+var tempSocket;
+
 /* Represent a player*/
 class Player {
     constructor(playerID, socket, x_pos, y_pos, userName) {
@@ -150,16 +153,15 @@ function emit(socket, emitType, eventName, ...emitArgs)
     }
 }
 
-function clbkSendRoomsStatus(socket)
+function clbkSendRoomsStatus()
 {
-    console.info("socket" + socket)
     let roomsCoop = [1,1,1];
     let roomsPvp = [1,1,1];
     let packet = []
     packet.push(roomsCoop)
     packet.push(roomsPvp)
     
-    emit(socket, 
+    emit(tempSocket, 
         EMIT_TO_SINGLE,
         constants.GET_ROOMS_STATUS_RESP,
         packet)
@@ -318,6 +320,7 @@ function clbkConnectionEstablished(socket,io, userName)
     registerEvents(socket);
 
     sendUserNameToClient(socket, userName)
+    tempSocket = socket;
     //assignID2Player(socket, userName);
 }
 
