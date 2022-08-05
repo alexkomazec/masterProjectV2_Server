@@ -152,6 +152,7 @@ function emit(socket, emitType, eventName, ...emitArgs)
 
 function clbkSendRoomsStatus(socket)
 {
+    console.info("socket" + socket)
     let roomsCoop = [1,1,1];
     let roomsPvp = [1,1,1];
     let packet = []
@@ -325,7 +326,7 @@ function sendUserNameToClient(socket, userName)
     emit(socket,
         EMIT_TO_SINGLE,
         constants.SET_USERNAME,
-        userName ) //Payload
+        userName) //Payload
 
     console.debug(userName + "has been sent to the client")
 }
