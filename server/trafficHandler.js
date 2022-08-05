@@ -155,8 +155,8 @@ function emit(socket, emitType, eventName, ...emitArgs)
 
 function clbkSendRoomsStatus()
 {
-    let roomsCoop = [1,1,1];
-    let roomsPvp = [1,1,1];
+    let roomsCoop = [1,2,1];
+    let roomsPvp = [1,2,2];
     let packet = []
     packet.push(roomsCoop)
     packet.push(roomsPvp)
