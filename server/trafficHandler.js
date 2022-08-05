@@ -89,6 +89,7 @@ function registerEvents(socket)
     socket.on(constants.UPDATE_PLAYER_INPUT_POS, clbkUpdatePlayerInputPos)
     socket.on(constants.PLAYER_CHANGED_DIRECTION_REQ, clbkPlayerChangedDirReq)
     socket.on(constants.PLAYER_TABLE_UPDATED, clbkPlayerTableUpdated)
+    socket.on(constants.GET_ROOMS_STATUS, clbkSendRoomsStatus)
 
     socket.on(constants.DISCONNECT, function()
     {
@@ -149,6 +150,19 @@ function emit(socket, emitType, eventName, ...emitArgs)
     }
 }
 
+function clbkSendRoomsStatus(socket)
+{
+    let roomsCoop = [1,1,1];
+    let roomsPvp = [1,1,1];
+    let packet = []
+    packet.push(roomsCoop)
+    packet.push(roomsPvp)
+    
+    emit(socket, 
+        EMIT_TO_SINGLE,
+        constants.GET_ROOMS_STATUS_RESP,
+        packet)
+}
 /* assignID2Player: Assign Unieque ID to the player */
 
 /* Input parameters: 
@@ -302,9 +316,19 @@ function clbkConnectionEstablished(socket,io, userName)
     console.info("Player Connected!");
     registerEvents(socket);
 
-    assignID2Player(socket, userName);
+    sendUserNameToClient(socket, userName)
+    //assignID2Player(socket, userName);
 }
 
+function sendUserNameToClient(socket, userName)
+{
+    emit(socket,
+        EMIT_TO_SINGLE,
+        constants.SET_USERNAME,
+        userName ) //Payload
+
+    console.debug(userName + "has been sent to the client")
+}
 /* ---------- Custom Event callbacks -------------------------------------------------------------------------*/
 
 /* clbkPlayerFiresMagic: Receives the event from the player which casts the spell*/

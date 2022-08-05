@@ -57,3 +57,12 @@ define("PLAYER_TABLE_UPDATED", "playerTableUpdated")
 
 /* Inform Clients that should create everything on the map, and start the game */
 define("CREATE_ALL_ENEMIES", "createAllEnemies")
+
+/* The server sends the username to the client */
+define("SET_USERNAME", "setUsername")
+
+/* The server receives the request for getting current rooms status */
+define("GET_ROOMS_STATUS", "getRoomsStatusReq")
+
+/* The server sends the answer for getRoomsStatusReq reqyest */
+define("GET_ROOMS_STATUS_RESP", "getRoomsStatusResp")
