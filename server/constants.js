@@ -5,9 +5,32 @@ function define(name, value) {
     });
 }
 
+/* Create another player n steps away */
+define("SPAWN_POSITION_OFFSET_MULTIPLIER", 2)
+/* Player room Id when the player is not in the room */
+define("ROOM_ID_DEFAULT", -1)
+/* PlayerID when the player is not in the room */
+define("PLAYER_ID_DEFAULT", -1)
+/* There are no players in the room */
+define("EMPTY", 0)
+/* One player is in the room, if matchInProgress is false, one more player cna join */
+define("HALF_FULL", 1)
+/* The room is full, so on one can join the room */
+define("FULL", 2)
+
 define("MAX_NUM_PLAYERS", 2)
 
 define("SLEEPING_TIME_MS", 5000)
+
+define("NOT_IN_THE_ROOM", -1)
+
+define("COOP_ROOMS", 0)
+
+define("PVP_ROOMS", 1)
+
+define("NO_OF_ROOM_TYPES", 2)
+
+define("NUMBER_OF_ROOMS", 3)
 
 /* LISTEN: This event is emitted when a new TCP stream is established */
 define("CONNECTION", "connection");
@@ -66,3 +89,15 @@ define("GET_ROOMS_STATUS", "getRoomsStatusReq")
 
 /* The server sends the answer for getRoomsStatusReq reqyest */
 define("GET_ROOMS_STATUS_RESP", "getRoomsStatusResp")
+
+/* The server receives the request from the client to join a room */
+define("ASK_TO_JOIN_ROOM", "askToJoinRoom")
+
+/* Send the client new redefined position */
+define("REDEFINED_PLAYER_POSITION", "redefinedPlayerPosition")
+
+/* LISTEN: Receives the request to go out from the room */
+define("GO_OUT_FROM_ROOM", "goOutFromRoom")
+
+/* EMIT: Send the response to go out from the room */
+define("GO_OUT_FROM_ROOM_RESP", "goOutFromRoomResp")

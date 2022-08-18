@@ -13,10 +13,10 @@ const mongoose = require('mongoose');
 const mongoDB = 'mongodb+srv://' + process.env.MONGO_DB_USERNAME + ':' + process.env.MONGO_DB_PASSWORD + '@' + process.env.MONGO_DB_CLUSTER_NUMBER +'/' + process.env.MONGO_DB_DATABASE_NAME + '?retryWrites=true&w=majority';
 
 const PlayerModel = require('./DataBaseModels/players');
+const { domainToUnicode } = require("url");
 
 var profileUsername
 var profilePassword
-
 
 console.log = function() {}
 //console.info = function () {}
@@ -41,6 +41,8 @@ mongoose.connect(mongoDB,
 
     /* Server is starting to listen to PORT, at IP_ADDRESS*/
     server.listen(PORT, trafficHandler.clbkPrintNetworkInfo(PORT, IP_ADDRESS));
+
+    trafficHandler.initModule();
 
     /* Register Socket.io server CONNECTION event*/    
     io.on(constants.CONNECTION, function(socket)
@@ -115,11 +117,6 @@ mongoose.connect(mongoDB,
                 return next(new Error("Invalid password"));
             }
 
-            /* Check if the game session is already running*/
-            if (!trafficHandler.isGameSessionAvailable()) {
-                return next(new Error("Game is already running, try later"));
-            }
-
             /* Regular login, accept socket connectiom from the client*/
             updateTheDocument(listOfFoundUsers[0].username.toString(),
                 'currentlyOnline',
@@ -164,7 +161,7 @@ mongoose.connect(mongoDB,
             return next(new Error("Something went wrong during registration"));
         }
 
-        return next(new Error("User registered!"));});
+        return next("User registered!");});
     }
 
      /* ========== Update one document ==========
