@@ -252,8 +252,8 @@ function initModule()
 
 function getRoom(roomType, roomNumber)
 {
-    console.info("roomType: " + roomType)
-    console.info("roomNumber: " + roomNumber)
+    console.debug("roomType: " + roomType)
+    console.debug("roomNumber: " + roomNumber)
     return rooms[roomType][roomNumber]
 }
 
@@ -282,10 +282,15 @@ function registerEvents(socket)
         /* Check if the player was in any rooms*/
         if(player.roomType != constants.NOT_IN_THE_ROOM)
         {
+                        
+            /* Inform others in the room that this player disconnected */
+            /* Note: Informing others is only important if the the players were in the room*/
+            socket.to(room.roomName).emit(constants.PLAYER_DISCONNECTED, player.playerID, constants.DISCONNECT_DISCONNECT)
+
             /* The player was in the room, release the slot in the room */
             room = getRoom(player.roomType, player.roomID)
             room.removePlayerFromRoom(player, playerIndex)
-
+            
             if(room.noOfReadyPlayers > 0)
             {
                 room.playerGaveUp()
@@ -294,10 +299,7 @@ function registerEvents(socket)
             {
                 console.error("Error: room type: "+ room.roomName + " noOfReadyPlayers: " + room.noOfReadyPlayers)
             }
-            
-            /* Inform others in the room that this player disconnected */
-            /* Note: Informing others is only important if the the players were in the room*/
-            socket.to(room.roomName).emit(constants.PLAYER_DISCONNECTED, player.playerID)
+
         }
         else
         {
@@ -319,13 +321,13 @@ function registerEvents(socket)
 
 function printPlayers()
 {
-    console.info(" ========= Print all players in the table =========")
+    console.debug(" ========= Print all players in the table =========")
     for (let i = 0; i < arrPlayers.length; i++) 
     {
-        console.info("Player " + i + ": ")
+        console.debug("Player " + i + ": ")
         printObject(arrPlayers[i])
     }
-    console.info("===================================================")
+    console.debug("===================================================")
 }
 
 /* emit: This is a warpper function to socket.io emit options*/
@@ -379,7 +381,7 @@ function assignID2Player(socket, player, room, index)
         console.info("room.roomName:" + room.roomName)
         console.info("iDForNextPlayer:" + iDForNextPlayer)
         //socket.to(socket.id).emit(constants.ASSIGN_ID_2_PLAYER, iDForNextPlayer)
-        
+
         emit(socket,
             EMIT_TO_SINGLE,
             constants.ASSIGN_ID_2_PLAYER,
@@ -487,7 +489,7 @@ function printObject(objectInstance)
         }
     }
 
-    console.info(objectPrintedInOneLine)
+    console.debug(objectPrintedInOneLine)
     objectPrintedInOneLine = ""
 }
 
@@ -537,8 +539,8 @@ function clbkRemovePlayerFromRoom(socketID)
             room = getRoom(player.roomType, player.roomID)
 
             /* Inform others to remove the leaving player from the game */
-            socket.to(room.roomName).emit(constants.PLAYER_DISCONNECTED, player.playerID)
-            socketIoServer.to(socketID).emit(constants.GO_OUT_FROM_ROOM_RESP);
+            socketIoServer.to(room.roomName).emit(constants.PLAYER_DISCONNECTED, player.playerID, constants.DISCONNECT_GO_OUT_FROM_ROOM)
+            //socketIoServer.to(socketID).emit(constants.GO_OUT_FROM_ROOM_RESP);
 
             room.removePlayerFromRoom(player, playerIndex)
 
@@ -854,10 +856,10 @@ function clbkAddPlayerToTheTable(playerWidth, player_x, player_y, socketID)
 
         console.info("room.noOfReadyPlayers === 1, send new data to the current socket")
 
-        emit(player.socket, 
-            EMIT_TO_SINGLE, 
-            constants.REDEFINED_PLAYER_POSITION,
-            packet)
+        //emit(player.socket, 
+        //    EMIT_TO_SINGLE, 
+        //    constants.REDEFINED_PLAYER_POSITION,
+        //    packet)
     }
     else if(noOfConnectedPlayers > 2)
     {

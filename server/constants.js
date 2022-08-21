@@ -32,6 +32,9 @@ define("NO_OF_ROOM_TYPES", 2)
 
 define("NUMBER_OF_ROOMS", 3)
 
+define("DISCONNECT_GO_OUT_FROM_ROOM", 1)
+define("DISCONNECT_DISCONNECT", 0)
+
 /* LISTEN: This event is emitted when a new TCP stream is established */
 define("CONNECTION", "connection");
 
