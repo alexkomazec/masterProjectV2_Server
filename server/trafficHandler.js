@@ -282,13 +282,13 @@ function registerEvents(socket)
         /* Check if the player was in any rooms*/
         if(player.roomType != constants.NOT_IN_THE_ROOM)
         {
+            /* The player was in the room, release the slot in the room */
+            room = getRoom(player.roomType, player.roomID)
                         
             /* Inform others in the room that this player disconnected */
             /* Note: Informing others is only important if the the players were in the room*/
             socket.to(room.roomName).emit(constants.PLAYER_DISCONNECTED, player.playerID, constants.DISCONNECT_DISCONNECT)
 
-            /* The player was in the room, release the slot in the room */
-            room = getRoom(player.roomType, player.roomID)
             room.removePlayerFromRoom(player, playerIndex)
             
             if(room.noOfReadyPlayers > 0)
@@ -646,7 +646,7 @@ function getRoomsState()
 /* Input parameters: 
     - clientID: Player's unique identifier
 */
-function clbkPlayerFiresMagic(socketID, inputSchema)
+function clbkPlayerFiresMagic(socketID, inputCommandList, positionX, positionY, bulletXvel, bulletDirectionOnShoot)
 {
     let player = arrPlayers[findThePlayerBySocketID(socketID)]
     let tempSocket = player.socket
@@ -655,7 +655,11 @@ function clbkPlayerFiresMagic(socketID, inputSchema)
     if(player.roomID != constants.ROOM_ID_DEFAULT && player.roomType != constants.NOT_IN_THE_ROOM)
     {
         packet.push(player.playerID)
-        packet.push(inputSchema)
+        packet.push(inputCommandList)
+        packet.push(positionX)
+        packet.push(positionY)
+        packet.push(bulletXvel)
+        packet.push(bulletDirectionOnShoot)
         console.log("**********PlayerFiresMagic************" + packet)
         
         room = getRoom(player.roomType, player.roomID)
