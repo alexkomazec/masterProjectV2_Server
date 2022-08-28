@@ -104,3 +104,9 @@ define("GO_OUT_FROM_ROOM", "goOutFromRoom")
 
 /* EMIT: Send the response to go out from the room */
 define("GO_OUT_FROM_ROOM_RESP", "goOutFromRoomResp")
+
+/* LISTEN: Received collision event */
+define("COLLISION_EVENT", "collisionEvent")
+
+/* EMIT: Forward collision event to all others expect sender/host */
+define("COLLISION_EVENT_RECEIVED", "collisionEventReceive")

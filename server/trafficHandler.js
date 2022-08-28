@@ -40,12 +40,13 @@ class Player {
 class Room {
 
     constructor() {
-        this.roomStatus = constants.EMPTY;     /* Room status*/
-        this.slotsRoomStatus = [false, false]; /* Track of free/reserverd IDs for the players in the room */
-        this.playersIDs      = [-1, -1];       /* When a player joins a room, it should give its id to toe room */            
-        this.matchInProgress = false           /* flag that indicates match is is progress */
-        this.noOfReadyPlayers = 0;             /* flag that indicates numbero f players that are ready */
-        this.roomName = ""                     /* Everu room has name */
+        this.roomStatus = constants.EMPTY;          /* Room status*/
+        this.slotsRoomStatus = [false, false];      /* Track of free/reserverd IDs for the players in the room */
+        this.playersIDs      = [-1, -1];            /* When a player joins a room, it should give its id to toe room */            
+        this.matchInProgress = false                /* flag that indicates match is is progress */
+        this.noOfReadyPlayers = 0;                  /* flag that indicates numbero f players that are ready */
+        this.roomName = ""                          /* Everu room has name */
+        this.anyActiveRequestToJoinRoom = false;    /* One request to join the room can be handled at the time*/
     }
 
     getNoOfConnectedPlayers()
@@ -269,6 +270,7 @@ function registerEvents(socket)
     socket.on(constants.GET_ROOMS_STATUS, clbkSendRoomsStatus)
     socket.on(constants.ASK_TO_JOIN_ROOM, clbkAskToJoinRoom)
     socket.on(constants.GO_OUT_FROM_ROOM, clbkRemovePlayerFromRoom)
+    socket.on(constants.COLLISION_EVENT, clbkCollisionEvent)
 
     socket.on(constants.DISCONNECT, function()
     {
@@ -585,6 +587,20 @@ function clbkConnectionEstablished(socket,io, userName)
     tempSocket = socket;
 }
 
+function clbkCollisionEvent(socketID, bodyId1, bodyName1, bodyId2, bodyName2)
+{
+    let player = arrPlayers[findThePlayerBySocketID(socketID)]
+    let tempSocket = player.socket
+    let packet = []
+
+    packet.push(bodyId1)
+    packet.push(bodyName1)
+    packet.push(bodyId2)
+    packet.push(bodyName2)
+    room = getRoom(player.roomType, player.roomID)
+    tempSocket.to(room.roomName).emit(constants.COLLISION_EVENT_RECEIVED, packet)
+}
+
 function sendUserNameToClient(socket, userName)
 {
     emit(socket,
@@ -852,7 +868,7 @@ function clbkAddPlayerToTheTable(playerWidth, player_x, player_y, socketID)
     if(noOfConnectedPlayers == 1)
     {
         let packet = []
-        player.x_pos += playerWidth * constants.SPAWN_POSITION_OFFSET_MULTIPLIER
+        //player.x_pos += playerWidth * constants.SPAWN_POSITION_OFFSET_MULTIPLIER
         
         packet.push(player.playerID)
         packet.push(player.x_pos)
@@ -908,30 +924,40 @@ function clbkAskToJoinRoom(roomType, roomNumber, socketID)
         log.error("clbkAskToJoinRoom: wrong roomNumber " + roomNumber)
     }
 
-    /* Check if the room is free */
-    if(rooms[roomTypeInt][roomNumber].anyFreeSpaceInRoom() == true)
+    if(rooms[roomTypeInt][roomNumber].anyActiveRequestToJoinRoom == false)
     {
-        let index = findThePlayerBySocketID(socketID)
+        rooms[roomTypeInt][roomNumber].anyActiveRequestToJoinRoom = true;
+        /* Check if the room is free */
+        if(rooms[roomTypeInt][roomNumber].anyFreeSpaceInRoom() == true)
+        {
+            let index = findThePlayerBySocketID(socketID)
 
-        /* Add the client to the room */
-        rooms[roomTypeInt][roomNumber].addPlayerToRoom(roomNumber, index)
-        
-        /* Assign the room to the client */
-        arrPlayers[index].roomID = roomNumber
-        arrPlayers[index].roomType = roomTypeInt
-        
-        /* Add socket from scoket.io into specified room */
-        socketIoRoomName = roomType + " Room " + roomNumber
-        rooms[roomTypeInt][roomNumber].roomName = socketIoRoomName
-        let socket = arrPlayers[index].socket
-        socket.join(socketIoRoomName)
+            /* Add the client to the room */
+            rooms[roomTypeInt][roomNumber].addPlayerToRoom(roomNumber, index)
+            
+            /* Assign the room to the client */
+            arrPlayers[index].roomID = roomNumber
+            arrPlayers[index].roomType = roomTypeInt
+            
+            /* Add socket from scoket.io into specified room */
+            socketIoRoomName = roomType + " Room " + roomNumber
+            rooms[roomTypeInt][roomNumber].roomName = socketIoRoomName
+            let socket = arrPlayers[index].socket
+            socket.join(socketIoRoomName)
 
-        /* Start the process of connecting client to the room*/
-        assignID2Player(socket,  arrPlayers[index], rooms[roomTypeInt][roomNumber], index);
+            rooms[roomTypeInt][roomNumber].anyActiveRequestToJoinRoom = false;
+
+            /* Start the process of connecting client to the room*/
+            assignID2Player(socket,  arrPlayers[index], rooms[roomTypeInt][roomNumber], index);
+        }
+        else
+        {
+            console.error("The room " + roomType + " room ID: " + roomNumber + " is full") 
+        }
     }
     else
     {
-        log.error("The room " + roomType + " room ID: " + roomNumber + " is full") 
+        console.error("Entering Room request is being in process")
     }
 }
 
