@@ -18,9 +18,9 @@ const { domainToUnicode } = require("url");
 var profileUsername
 var profilePassword
 
-console.log = function() {}
+//console.log = function() {}
 //console.info = function () {}
-console.debug = function() {}
+//console.debug = function() {}
 //console.warn = function() {}
 //console.error = function() {}
 
@@ -131,6 +131,7 @@ mongoose.connect(mongoDB,
 
         PlayerModel.find({username: profileUsername}, function (err, listOfFoundUsers)
         {
+
             /* Check for the error */
             if (err)
             {
@@ -161,7 +162,9 @@ mongoose.connect(mongoDB,
             return next(new Error("Something went wrong during registration"));
         }
 
-        return next("User registered!");});
+        return next(new Error("User registered!"));
+    
+    });
     }
 
      /* ========== Update one document ==========
