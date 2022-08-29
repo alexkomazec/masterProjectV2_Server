@@ -662,7 +662,7 @@ function getRoomsState()
 /* Input parameters: 
     - clientID: Player's unique identifier
 */
-function clbkPlayerFiresMagic(socketID, inputCommandList, positionX, positionY, bulletXvel, bulletDirectionOnShoot)
+function clbkPlayerFiresMagic(socketID, inputCommandFire, positionX, positionY, bulletXvel, bulletDirectionOnShoot)
 {
     let player = arrPlayers[findThePlayerBySocketID(socketID)]
     let tempSocket = player.socket
@@ -671,7 +671,7 @@ function clbkPlayerFiresMagic(socketID, inputCommandList, positionX, positionY, 
     if(player.roomID != constants.ROOM_ID_DEFAULT && player.roomType != constants.NOT_IN_THE_ROOM)
     {
         packet.push(player.playerID)
-        packet.push(inputCommandList)
+        packet.push(inputCommandFire)
         packet.push(positionX)
         packet.push(positionY)
         packet.push(bulletXvel)
